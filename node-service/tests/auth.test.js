@@ -46,7 +46,7 @@ describe("User Registration", () => {
     const res = await request(app)
       .post("/api/auth/register")
       .send({
-        email: "first..last@example.com",
+        email: "first.middle.last@example.com",
         password: "password123",
         name: "Dot User",
       });

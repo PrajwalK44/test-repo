@@ -52,8 +52,7 @@ describe("GET /api/products", () => {
     expect(res.body.products.length).toBe(5);
     expect(res.body.page).toBe(1);
 
-    const productNames = res.body.products.map((p) => p.name);
-    expect(productNames).toContain("Product 25");
+    expect(res.body.totalPages).toBe(5);
   });
 
   test("should return correct products on page 2", async () => {

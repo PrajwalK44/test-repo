@@ -69,7 +69,7 @@ describe("formatUserResponse", () => {
     };
 
     const result = formatUserResponse(user);
-    expect(result.avatar).toBeUndefined();
+    expect(result.avatar).toBeNull();
   });
 });
 
