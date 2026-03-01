@@ -162,6 +162,22 @@ results = Product.query.filter(
 
 ---
 
+### INC-008: Checkout Crash — Missing Import (Missing Import)
+**Difficulty**: Easy
+
+**Root Cause**: In `app/routes/payments.py:62`, `logging.info(...)` is called but the `logging` module is never imported at the top of the file. The app starts fine (the function isn't called at import time), but the checkout endpoint crashes with `NameError: name 'logging' is not defined` when processing a payment.
+
+**Expected Fix**: Add `import logging` at the top of `app/routes/payments.py`:
+```python
+import logging
+```
+
+**Validation**: `test_checkout_processes_payment` in `tests/test_payments.py` should pass — the order status should change to "paid".
+
+**Tests That Should Pass After Fix**: `TestCheckout::test_checkout_processes_payment`
+
+---
+
 ## Node.js Service Incidents
 
 ### INC-101: Unhandled Promise Rejection (Runtime Crash)
@@ -297,11 +313,38 @@ bio: user.profile?.bio ?? null,
 
 ---
 
+### INC-108: Product Search Crash — Missing Dependency (Missing Dependency)
+**Difficulty**: Easy-Medium
+
+**Root Cause**: `src/routes/products.js` has a `/search` endpoint that calls `require("fuse.js")` inside the handler function. The `fuse.js` package is NOT listed in `package.json` and is not installed. The app starts fine (the require is lazy, inside a function), but calling `GET /api/products/search?q=...` crashes with `Cannot find module 'fuse.js'`.
+
+**Expected Fix**: Replace the fuse.js dependency with Sequelize's built-in `Op.like` operator (already available via Sequelize):
+```javascript
+const { Op } = require("sequelize");
+const products = await Product.findAll({
+  where: {
+    [Op.or]: [
+      { name: { [Op.like]: `%${q}%` } },
+      { description: { [Op.like]: `%${q}%` } },
+    ],
+  },
+});
+res.json({ products: products.map(formatProductResponse), count: products.length });
+```
+
+Alternative fix: Install fuse.js (`npm install fuse.js`) and add it to package.json. Both approaches are acceptable.
+
+**Validation**: `test should search products by name` in `tests/products.test.js` should pass.
+
+**Tests That Should Pass After Fix**: `GET /api/products/search > should search products by name`
+
+---
+
 ## Summary: Test Results Before/After
 
 ### Before Fixes (Expected Failures)
-**Python**: ~8-10 test failures across auth, payments, products/security
-**Node.js**: ~6-8 test failures across auth, users, products, formatters
+**Python**: All tests blocked by INC-003 ImportError; after fixing INC-003, additional failures from INC-001, INC-004, INC-006, INC-007, INC-008
+**Node.js**: ~11 test failures across auth, users, products, formatters
 
 ### After All Fixes
 **Python**: All tests pass (0 failures)

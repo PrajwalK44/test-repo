@@ -30,6 +30,33 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET /api/products/search
+router.get("/search", async (req, res) => {
+  try {
+    const Fuse = require("fuse.js");
+    const { q } = req.query;
+
+    if (!q) {
+      return res.status(400).json({ error: "Search query 'q' is required" });
+    }
+
+    const products = await Product.findAll();
+    const fuse = new Fuse(
+      products.map((p) => formatProductResponse(p)),
+      {
+        keys: ["name", "description"],
+        threshold: 0.4,
+      }
+    );
+
+    const results = fuse.search(q).map((r) => r.item);
+    res.json({ products: results, count: results.length });
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({ error: "Search failed" });
+  }
+});
+
 // GET /api/products/:id
 router.get("/:id", async (req, res) => {
   try {

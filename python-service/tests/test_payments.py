@@ -110,3 +110,45 @@ class TestPaymentFlow:
         expected_total = 29.99 + expected_tax  # 32.54
         assert order_data["order"]["tax"] == expected_tax
         assert order_data["order"]["total"] == expected_total
+
+
+class TestCheckout:
+    """Tests for POST /api/payments/checkout."""
+
+    def test_checkout_processes_payment(self, client, auth_token, sample_products, db):
+        """Should process payment and mark order as paid."""
+        # First, create an order
+        order_response = client.post(
+            "/api/orders/",
+            data=json.dumps({
+                "items": [
+                    {"product_id": sample_products[0].id, "quantity": 1},
+                ]
+            }),
+            content_type="application/json",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+        assert order_response.status_code == 201
+        order_id = order_response.get_json()["order"]["id"]
+
+        # Now checkout
+        response = client.post(
+            "/api/payments/checkout",
+            data=json.dumps({"order_id": order_id}),
+            content_type="application/json",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data["message"] == "Payment processed successfully"
+        assert data["order"]["status"] == "paid"
+
+    def test_checkout_nonexistent_order(self, client, auth_token):
+        """Should return 404 for non-existent order."""
+        response = client.post(
+            "/api/payments/checkout",
+            data=json.dumps({"order_id": 99999}),
+            content_type="application/json",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+        assert response.status_code == 404

@@ -59,6 +59,7 @@ def checkout():
 
     # Simulate payment processing
     order.status = "paid"
+    logging.info(f"Payment processed for order {order.id}, total: {order.total}")
     db.session.commit()
 
     return jsonify({

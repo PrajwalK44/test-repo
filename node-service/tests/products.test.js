@@ -69,6 +69,23 @@ describe("GET /api/products", () => {
   });
 });
 
+describe("GET /api/products/search", () => {
+  test("should search products by name", async () => {
+    const res = await request(app).get("/api/products/search?q=Product");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.products).toBeDefined();
+    expect(res.body.count).toBeGreaterThan(0);
+  });
+
+  test("should return 400 without query parameter", async () => {
+    const res = await request(app).get("/api/products/search");
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toContain("Search query");
+  });
+});
+
 describe("GET /api/products/:id", () => {
   test("should return product by ID", async () => {
     const listRes = await request(app).get("/api/products?page=1&limit=1");
