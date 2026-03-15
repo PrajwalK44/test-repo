@@ -1,0 +1,5 @@
+{
+  "generated_test_files": [
+    "tests/test_auth_login.py"
+  ]
+}
