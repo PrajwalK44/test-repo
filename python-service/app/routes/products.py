@@ -46,8 +46,8 @@ def search_products():
     if not query:
         return jsonify({"error": "Search query parameter 'q' is required"}), 400
 
-    sql = f"SELECT * FROM products WHERE name LIKE '%{query}%' OR description LIKE '%{query}%'"
-    results = db.session.execute(db.text(sql))
+    sql = "SELECT * FROM products WHERE name LIKE :query OR description LIKE :query"
+    results = db.session.execute(db.text(sql), {"query": f"%{query}%"})
 
     products = []
     for row in results:
