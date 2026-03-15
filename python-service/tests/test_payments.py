@@ -103,6 +103,24 @@ class TestPaymentFlow:
         )
         assert order_response.status_code == 201
         order_data = order_response.get_json()
+        order_id = order_data["id"]
+        
+        # Process payment for the order
+        checkout_response = client.post(
+            "/api/payments/checkout",
+            data=json.dumps({"order_id": order_id}),
+            content_type="application/json",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+        assert checkout_response.status_code == 200
+        checkout_data = checkout_response.get_json()
+        assert checkout_data["message"] == "Payment processed successfully"
+        assert checkout_data["order"]["status"] == "paid"
+            content_type="application/json",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+        assert order_response.status_code == 201
+        order_data = order_response.get_json()
         order_id = order_data["order"]["id"]
 
         # Verify the order total includes correct tax
