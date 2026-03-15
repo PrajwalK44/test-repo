@@ -6,9 +6,17 @@ const { formatUserResponse } = require("../utils/formatters");
 const router = express.Router();
 
 // GET /api/users/:id
-router.get("/:id", authenticate, async (req, res) => {
-  const user = await userService.getById(req.params.id);
-  res.json({ user: user.toJSON() });
+router.get("/:id", authenticate, async (req, res, next) => {
+  try {
+    const user = await userService.getById(req.params.id);
+    res.json({ user: user.toJSON() });
+  } catch (error) {
+    if (error.message === "User not found") {
+      res.status(404).json({ error: "User not found" });
+    } else {
+      next(error);
+    }
+  }
 });
 
 // GET /api/users/me/profile
