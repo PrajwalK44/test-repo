@@ -1,0 +1,6 @@
+{
+  "generated_test_files": [
+    "tests/test_payments_checkout.py",
+    "python-service/tests/test_payments.py"
+  ]
+}

@@ -152,3 +152,42 @@ class TestCheckout:
             headers={"Authorization": f"Bearer {auth_token}"},
         )
         assert response.status_code == 404
+
+
+
+# Tests for calculate_tax
+# Bug fix: Fixed tax calculation to use correct formula (subtotal * tax_rate / 100) instead of incorrect integer division
+
+
+class TestCalculate_Tax:
+    """Test suite for calculate_tax after bug fix."""
+
+    def test_calculate_tax_200(self):
+        """Should calculate 8.5% tax on $200.00."""
+        subtotal = 200.0
+        result = calculate_tax(subtotal)
+        assert result == 17.0
+
+    def test_calculate_tax_49_99(self):
+        """Should calculate 8.5% tax on $49.99."""
+        subtotal = 49.99
+        result = calculate_tax(subtotal)
+        assert result == 4.25
+
+    def test_calculate_tax_0(self):
+        """Should return 0 tax for $0.00 subtotal."""
+        subtotal = 0
+        result = calculate_tax(subtotal)
+        assert result == 0.0
+
+    def test_calculate_tax_999_99(self):
+        """Should calculate tax on $999.99."""
+        subtotal = 999.99
+        result = calculate_tax(subtotal)
+        assert result == 85.0
+
+    def test_calculate_tax_100(self):
+        """Should calculate 8.5% tax on $100.00."""
+        subtotal = 100.0
+        result = calculate_tax(subtotal)
+        assert result == 8.5
