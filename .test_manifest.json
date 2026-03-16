@@ -1,5 +1,6 @@
 {
   "generated_test_files": [
-    "tests/test_auth_login.py"
+    "tests/test_auth_login.py",
+    "tests/test_payments.py"
   ]
 }
