@@ -43,6 +43,21 @@ describe("GET /api/users/:id", () => {
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBeDefined();
   });
+
+  // Explicitly test the UserService.getById method for non-existent users
+  test("UserService.getById should return null for non-existent user", async () => {
+    const UserService = require("../src/services/userService");
+    const user = await UserService.getById(99999);
+    expect(user).toBeNull();
+  });
+
+  // Explicitly test the UserService.getById method for existing users
+  test("UserService.getById should return user for existing user", async () => {
+    const UserService = require("../src/services/userService");
+    const user = await UserService.getById(testUserId);
+    expect(user).not.toBeNull();
+    expect(user.email).toBe("usertest@example.com");
+  });
 });
 
 describe("GET /api/users/me/profile", () => {

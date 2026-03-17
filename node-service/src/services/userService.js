@@ -4,7 +4,7 @@ class UserService {
   async getById(id) {
     const user = await User.findByPk(id);
     if (!user) {
-      throw new Error("User not found");
+      return null;
     }
     return user;
   }
