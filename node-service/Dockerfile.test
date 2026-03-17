@@ -1,0 +1,22 @@
+# Production-ready Dockerfile for Node.js service testing
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy all files from the node-service directory
+COPY . ./
+
+# Install dependencies globally
+RUN npm install -g jest
+RUN npm install
+RUN npm install supertest --save-dev
+RUN npm install sqlite3 --save-dev
+
+# Set NODE_PATH to resolve modules
+ENV NODE_PATH=/app/node_modules
+
+# Set working directory for tests
+WORKDIR /app
+
+# Run tests
+CMD ["npm", "test"]
