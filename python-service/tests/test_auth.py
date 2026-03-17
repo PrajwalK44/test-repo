@@ -95,3 +95,22 @@ class TestLogin:
             content_type="application/json",
         )
         assert response.status_code == 400
+
+    def test_login_bytes_password_hash(self, client, sample_user):
+        """Should handle bytes-like password_hash without TypeError (DEV-141 fix)."""
+        # Ensure the sample_user's password_hash is a bytes-like object (as stored in DB)
+        from app.models.user import User
+        user = User.query.filter_by(email="test@example.com").first()
+        assert isinstance(user.password_hash, str)  # Stored as string in DB, but encoded to bytes for bcrypt
+        
+        # Attempt login (should not raise TypeError)
+        response = client.post(
+            "/api/auth/login",
+            data=json.dumps({
+                "email": "test@example.com",
+                "password": "testpassword123",
+            }),
+            content_type="application/json",
+        )
+        assert response.status_code == 200
+        assert "access_token" in response.get_json()
