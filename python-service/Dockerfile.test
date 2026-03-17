@@ -1,0 +1,19 @@
+# Production-ready Dockerfile for testing the payment service
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /workspace
+
+# Install dependencies
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application code
+COPY . ./
+
+# Set environment variables
+ENV FLASK_ENV=testing
+ENV PYTHONPATH=/workspace
+
+# Run the tests for the payment service
+CMD ["pytest", "tests/test_payments.py", "-v"]
