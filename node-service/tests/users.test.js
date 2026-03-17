@@ -43,6 +43,18 @@ describe("GET /api/users/:id", () => {
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBeDefined();
   });
+
+  test("should return 500 for unexpected errors", async () => {
+    // Mock an unexpected error in userService.getById
+    jest.spyOn(require("../src/services/userService"), "getById").mockRejectedValueOnce(new Error("Database connection failed"));
+
+    const res = await request(app)
+      .get(`/api/users/${testUserId}`)
+      .set("Authorization", `Bearer ${authToken}`);
+
+    expect(res.statusCode).toBe(500);
+    expect(res.body.error).toBeDefined();
+  });
 });
 
 describe("GET /api/users/me/profile", () => {
