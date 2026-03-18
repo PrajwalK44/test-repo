@@ -86,9 +86,11 @@ def create_order():
     discount_code = data.get("discount_code")
 
     if discount_code:
-        subtotal, discount_amount = apply_discount(subtotal, discount_code)
+        discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code)
+    else:
+        discounted_subtotal = subtotal
 
-    total = subtotal + tax - discount_amount
+    total = discounted_subtotal + tax
 
     order = Order(
         user_id=int(user_id),
