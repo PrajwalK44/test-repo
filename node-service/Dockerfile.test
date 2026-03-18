@@ -1,0 +1,19 @@
+# Production-ready Dockerfile for testing the Node.js service
+
+# Use the official Node.js 18 image
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /workspace
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install --production
+
+# Copy the rest of the application
+COPY . .
+
+# Run tests
+CMD ["npm", "test"]
