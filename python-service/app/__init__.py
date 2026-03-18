@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
-from flask.json import JSONEncoder
+# Flask 2.3.0+ uses built-in JSON handling; no need for explicit encoder import
 
 from datetime import datetime, date
 from decimal import Decimal

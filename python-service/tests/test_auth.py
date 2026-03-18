@@ -63,6 +63,20 @@ class TestLogin:
         assert "access_token" in data
         assert data["user"]["email"] == "test@example.com"
 
+    def test_login_bytes_compatibility(self, client, sample_user):
+        """Should handle bytes/str compatibility for bcrypt.checkpw."""
+        # This test validates the fix for the TypeError: a bytes-like object is required, not 'str'
+        response = client.post(
+            "/api/auth/login",
+            data=json.dumps({
+                "email": "test@example.com",
+                "password": "testpassword123",
+            }),
+            content_type="application/json",
+        )
+        assert response.status_code == 200
+        # If no TypeError is raised, the fix is working correctly
+
     def test_login_wrong_password(self, client, sample_user):
         """Should return 401 for incorrect password."""
         response = client.post(
