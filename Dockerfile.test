@@ -1,0 +1,21 @@
+# Production-ready Dockerfile for testing email validation fix
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app/node-service
+
+# Copy package.json and install dependencies
+COPY node-service/package.json ./
+RUN npm install --prefer-offline --no-audit
+
+# Copy source code
+COPY . ./
+
+# Expose the application port
+EXPOSE 3000
+
+# Install jest globally and run tests
+RUN npm install -g jest
+# Add MySQL client for database connectivity
+RUN apk add --no-cache mysql-client
+CMD ["sh", "-c", "cd /app/node-service && jest tests/emailValidation.test.js"]

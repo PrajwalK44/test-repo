@@ -1,6 +1,12 @@
 const { check, validationResult } = require("express-validator");
 
-const EMAIL_REGEX = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const EMAIL_REGEX = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+function validateEmail(email) {
+  return EMAIL_REGEX.test(email);
+}
+
+module.exports = { validateEmail };
 
 function validateEmail(email) {
   return EMAIL_REGEX.test(email);

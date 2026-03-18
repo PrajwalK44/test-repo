@@ -3,6 +3,10 @@ const app = require("../src/index");
 const { sequelize, User } = require("../src/models");
 
 beforeAll(async () => {
+  process.env.DB_HOST = 'localhost';
+  process.env.DB_USER = 'root';
+  process.env.DB_PASSWORD = 'password';
+  process.env.DB_NAME = 'test_db';
   await sequelize.sync({ force: true });
 });
 
