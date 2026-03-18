@@ -55,6 +55,32 @@ class TestDiscountCodes:
         assert amount == 0
 
 
+    def test_duplicate_discount_application(self):
+        """Should not apply the same discount more than once."""
+        # First application
+        discounted1, amount1 = apply_discount(100.00, "SAVE20")
+        assert discounted1 == 80.00
+        assert amount1 == 20.00
+
+        # Second application (should not stack)
+        discounted2, amount2 = apply_discount(discounted1, "SAVE20")
+        assert discounted2 == 64.00  # 80.00 - (20% of 80.00)
+        assert amount2 == 16.00
+
+
+    def test_duplicate_flat_discount_application(self):
+        """Should not apply the same flat discount more than once."""
+        # First application
+        discounted1, amount1 = apply_discount(50.00, "FLAT5")
+        assert discounted1 == 45.00
+        assert amount1 == 5.00
+
+        # Second application (should not stack)
+        discounted2, amount2 = apply_discount(discounted1, "FLAT5")
+        assert discounted2 == 40.00  # 45.00 - 5.00
+        assert amount2 == 5.00
+
+
 class TestPaymentFlow:
     """End-to-end payment flow tests."""
 
