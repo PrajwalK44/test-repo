@@ -32,6 +32,16 @@ class TestTaxCalculation:
         tax = calculate_tax(100.00)
         assert tax == 8.5
 
+    def test_calculate_tax_edge_case_99_99(self):
+        """Should calculate 8.5% tax on $99.99."""
+        tax = calculate_tax(99.99)
+        assert tax == 8.5  # 99.99 * 0.085 = 8.499... ≈ 8.5
+
+    def test_calculate_tax_edge_case_100_01(self):
+        """Should calculate 8.5% tax on $100.01."""
+        tax = calculate_tax(100.01)
+        assert tax == 8.5  # 100.01 * 0.085 = 8.50085 ≈ 8.5
+
 
 class TestDiscountCodes:
     """Tests for discount application logic."""
