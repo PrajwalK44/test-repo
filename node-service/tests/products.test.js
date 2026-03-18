@@ -84,6 +84,25 @@ describe("GET /api/products/search", () => {
     expect(res.statusCode).toBe(400);
     expect(res.body.error).toContain("Search query");
   });
+
+  test("should reject SQL injection attempts", async () => {
+    // Test for basic SQL injection
+    const res1 = await request(app).get("/api/products/search?q=test' OR '1'='1");
+    expect(res1.statusCode).toBe(200);
+    expect(res1.body.products.length).toBeLessThan(25); // Should not return all products
+
+    // Test for UNION-based SQL injection
+    const res2 = await request(app).get("/api/products/search?q=test' UNION SELECT id,email,password_hash,null,null FROM users--");
+    expect(res2.statusCode).toBe(200);
+    expect(res2.body.products.length).toBeLessThan(25); // Should not return all products or sensitive data
+  });
+
+  test("should return filtered results for valid search queries", async () => {
+    const res = await request(app).get("/api/products/search?q=Product 1");
+    expect(res.statusCode).toBe(200);
+    expect(res.body.products.length).toBeGreaterThan(0);
+    expect(res.body.products.every(p => p.name.includes("Product 1"))).toBe(true);
+  });
 });
 
 describe("GET /api/products/:id", () => {
