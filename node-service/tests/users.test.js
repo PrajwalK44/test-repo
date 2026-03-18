@@ -42,6 +42,7 @@ describe("GET /api/users/:id", () => {
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBeDefined();
+    expect(res.body.error).toBe("User not found");
   });
 });
 
