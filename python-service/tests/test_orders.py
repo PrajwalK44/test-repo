@@ -83,6 +83,63 @@ class TestOrderCreation:
         assert data["order"]["discount_amount"] == 40.0
 
 
+    def test_create_order_with_flat_discount(self, client, auth_token, sample_products):
+        """Should apply flat discount code to order."""
+        response = client.post(
+            "/api/orders/",
+            data=json.dumps({
+                "items": [
+                    {"product_id": sample_products[2].id, "quantity": 1},  # $199.99
+                ],
+                "discount_code": "FLAT5",
+            }),
+            content_type="application/json",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+        assert response.status_code == 201
+        data = response.get_json()
+        # With FLAT5 ($5 off $199.99), discount should be $5.00
+        assert data["order"]["discount_amount"] == 5.00
+
+
+    def test_create_order_with_invalid_discount(self, client, auth_token, sample_products):
+        """Should not apply invalid discount code to order."""
+        response = client.post(
+            "/api/orders/",
+            data=json.dumps({
+                "items": [
+                    {"product_id": sample_products[2].id, "quantity": 1},  # $199.99
+                ],
+                "discount_code": "INVALID",
+            }),
+            content_type="application/json",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+        assert response.status_code == 201
+        data = response.get_json()
+        # With invalid code, discount should be $0.00
+        assert data["order"]["discount_amount"] == 0.0
+
+
+    def test_create_order_with_zero_discount(self, client, auth_token, sample_products):
+        """Should handle zero discount gracefully."""
+        response = client.post(
+            "/api/orders/",
+            data=json.dumps({
+                "items": [
+                    {"product_id": sample_products[2].id, "quantity": 1},  # $199.99
+                ],
+                "discount_code": "SAVE0",
+            }),
+            content_type="application/json",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+        assert response.status_code == 201
+        data = response.get_json()
+        # With SAVE0 (0% off $199.99), discount should be $0.00
+        assert data["order"]["discount_amount"] == 0.0
+
+
 class TestOrderListing:
     """Tests for GET /api/orders."""
 

@@ -25,7 +25,7 @@ class TestTaxCalculation:
     def test_calculate_tax_large_amount(self):
         """Should calculate tax on $999.99."""
         tax = calculate_tax(999.99)
-        assert tax == 85.0
+        assert tax == 85.0  # 999.99 * 0.085 = 84.99915 ≈ 85.0
 
     def test_calculate_tax_exact_hundred(self):
         """Should calculate 8.5% tax on $100.00."""
@@ -53,6 +53,41 @@ class TestDiscountCodes:
         discounted, amount = apply_discount(100.00, "INVALID")
         assert discounted == 100.00
         assert amount == 0
+
+
+    def test_zero_discount(self):
+        """Should return original subtotal for zero discount."""
+        discounted, amount = apply_discount(100.00, "SAVE0")
+        assert discounted == 100.00
+        assert amount == 0
+
+
+    def test_multiple_discounts_same_code(self):
+        """Should apply discount correctly for the same code."""
+        discounted, amount = apply_discount(100.00, "SAVE20")
+        assert discounted == 80.00
+        assert amount == 20.00
+
+
+    def test_discount_with_zero_subtotal(self):
+        """Should return zero discount for zero subtotal."""
+        discounted, amount = apply_discount(0.00, "SAVE20")
+        assert discounted == 0.00
+        assert amount == 0.00
+
+
+    def test_discount_with_negative_subtotal(self):
+        """Should handle negative subtotal gracefully."""
+        discounted, amount = apply_discount(-100.00, "SAVE20")
+        assert discounted == -80.00
+        assert amount == -20.00
+
+
+    def test_discount_with_flat_code(self):
+        """Should apply flat discount correctly."""
+        discounted, amount = apply_discount(50.00, "FLAT5")
+        assert discounted == 45.00
+        assert amount == 5.00
 
 
 class TestPaymentFlow:
