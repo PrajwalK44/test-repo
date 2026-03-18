@@ -19,8 +19,10 @@ def calculate_tax(subtotal):
     Returns:
         The tax amount rounded to 2 decimal places.
     """
-    tax = int(subtotal) // 100 * TAX_RATE
-    return round(tax, 2)
+    from decimal import Decimal, getcontext
+    getcontext().prec = 4  # Sufficient precision for tax calculations
+    tax = Decimal(str(subtotal)) * Decimal(str(TAX_RATE / 100))
+    return float(round(tax, 2))
 
 
 def apply_discount(subtotal, discount_code):
