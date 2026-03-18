@@ -98,6 +98,22 @@ class TestOrderListing:
         # Each order should include items
         for order in data["orders"]:
             assert "items" in order
+
+    def test_list_orders_performance(self, client, auth_token, sample_orders):
+        """Should list all orders for the authenticated user in under 500ms."""
+        import time
+        start_time = time.time()
+        response = client.get(
+            "/api/orders/",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+        end_time = time.time()
+        assert response.status_code == 200
+        assert end_time - start_time < 0.5, f"Response time too slow: {end_time - start_time:.2f}s"
+        data = response.get_json()
+        assert data["count"] == 5
+        for order in data["orders"]:
+            assert "items" in order
             assert len(order["items"]) == 3
 
     def test_get_single_order(self, client, auth_token, sample_orders):
