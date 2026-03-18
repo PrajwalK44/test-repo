@@ -1,0 +1,28 @@
+# Production-ready Dockerfile for Node.js service with Jest tests
+
+# Use official Node.js LTS image
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json (no package-lock.json found)
+COPY package.json ./
+
+# Install dependencies (no lock file)
+RUN npm install --prefer-offline --no-audit
+
+# Install sqlite3 and fuse.js for testing
+RUN npm install sqlite3 fuse.js
+
+# Copy source code
+COPY . ./
+
+# Set environment variables
+ENV NODE_ENV=test
+
+# Ensure Jest and dev dependencies are available globally
+RUN npm install -g jest
+
+# Run tests (Jest) from the correct working directory
+CMD ["sh", "-c", "cd /app && npm test"]
