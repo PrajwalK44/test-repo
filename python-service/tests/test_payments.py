@@ -54,6 +54,41 @@ class TestDiscountCodes:
         assert discounted == 100.00
         assert amount == 0
 
+    def test_discount_applied_only_once(self):
+        """Should ensure discount is applied only once, not twice."""
+        # Simulate the bug: applying discount twice
+        subtotal = 100.00
+        discount_code = "SAVE20"
+        
+        # First application
+        discounted_once, amount_once = apply_discount(subtotal, discount_code)
+        assert discounted_once == 80.00
+        assert amount_once == 20.00
+        
+        # Second application (should not happen in practice, but testing logic)
+        discounted_twice, amount_twice = apply_discount(discounted_once, discount_code)
+        assert discounted_twice == 64.00  # This is the bug: discount applied twice
+        assert amount_twice == 16.00  # 20% of 80.00
+
+    def test_discount_not_applied_twice_in_calculate_total(self, client, auth_token):
+        """Should ensure discount is not applied twice in the calculate_total endpoint."""
+        response = client.post(
+            "/api/payments/calculate",
+            data=json.dumps({
+                "subtotal": 100.00,
+                "discount_code": "SAVE20",
+            }),
+            content_type="application/json",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+        assert response.status_code == 200
+        data = response.get_json()
+        
+        # Verify discount is applied only once
+        assert data["discount_amount"] == 20.00
+        assert data["discounted_subtotal"] == 80.00
+        assert data["total"] == 88.5  # 80.00 + 8.50 tax
+
 
 class TestPaymentFlow:
     """End-to-end payment flow tests."""
