@@ -21,7 +21,7 @@ def register():
     password_hash = bcrypt.hashpw(
         data["password"].encode("utf-8"),
         bcrypt.gensalt()
-    ).decode("utf-8")
+    )
 
     user = User(
         email=data["email"],
